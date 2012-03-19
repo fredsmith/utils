@@ -1,0 +1,44 @@
+#! /bin/bash
+DEBUG="false";
+MAXCACHEAGE="60";
+COMMAND="false";
+
+while getopts "da:c:" optionName; do
+        case "$optionName" in
+                d)
+                        DEBUG="true"
+                        ;;
+                a)
+                        MAXCACHEAGE=$OPTARG;
+                        ;;
+                c)
+                        COMMAND=$OPTARG;
+                        ;;
+                [?])
+                        echo "$0 - (C) 2012 Fred Smith <derf@derf.us>";
+                        echo "Usage: $0 -a <max cache age> -c \"<command>\"";
+                        exit;
+         ;;
+   esac
+done
+
+
+CLEANCOMMAND=$(echo "$COMMAND" | sed -e 's/ /_/' -e 's/\///');
+CACHEFILE="/tmp/cacheof-$CLEANCOMMAND.txt";
+$DEBUG && echo "Cache File is: $CACHEFILE";
+
+if test -f $CACHEFILE; then {
+   CACHEAGE=$(($(date +%s) - $(stat -c '%Y' "$CACHEFILE")))
+} else {
+   CACHEAGE="100000";
+} fi;
+
+if test $CACHEAGE -lt $MAXCACHEAGE; then {
+   $DEBUG && echo "using cached version; $CACHEAGE seconds old."
+   cat $CACHEFILE;
+   exit;
+} fi;
+
+$COMMAND > $CACHEFILE;
+cat $CACHEFILE;
+
