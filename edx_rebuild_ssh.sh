@@ -5,33 +5,12 @@ echo '' > ~/.aws/credentials
 echo '' > ~/.aws/config
 echo '' > ~/.boto
 
-cd ~/workspace/configuration/util/vpc-tools
 for FILE in ~/workspace/aws-creds/*.txt; do
   BOUNCEHOST='none'
   . $FILE
-  if [[ ! -z "$AWS_VPC_STACK" ]]; then
-    export STACK="stack-name $AWS_VPC_STACK"
-  fi
-  if [[ ! -z "$AWS_SSH_KEY" ]]; then
-    export SSHKEY="identity-file $AWS_SSH_KEY"
-  fi
-  if [[ ! -z "$AWS_SSH_USERNAME" ]]; then
-    export SSHUSER="user $AWS_SSH_USERNAME"
-  fi
-  if [[ -z "$SKIP_SSHCONFIG" ]]; then
-    echo "#############################################" >> ~/.ssh/config
-    echo "############### $AWS_VPC_STACK ###############" >> ~/.ssh/config
-    echo "#############################################" >> ~/.ssh/config
-    echo $AWS_VPC_STACK
-    if [[ ! -z "$AWS_NETMASK" ]]; then
-      echo "Host $AWS_NETMASK.*" >> ~/.ssh/config
-      echo "    ProxyCommand ssh -W %h:%p $AWS_VPC_STACK-bastion" >> ~/.ssh/config
-      echo "    User $AWS_SSH_USERNAME" >> ~/.ssh/config
-      echo "" >> ~/.ssh/config
-    fi
-    python vpc-tools.py ssh-config $STACK $SSHKEY $SSHUSER strict-host-check no jump-box $BOUNCEHOST >> ~/.ssh/config
-  fi
+  echo -n " - `basename $FILE` "
   if [[ ! -z "$DO_AWSCONFIG" ]]; then
+    echo -n "[AWS]"
     echo "[$AWS_DEFAULT_PROFILE]" >> ~/.aws/credentials
     echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
     echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
@@ -41,11 +20,29 @@ for FILE in ~/workspace/aws-creds/*.txt; do
     echo "" >> ~/.aws/config
   fi
   if [[ ! -z "$DO_BOTOCONFIG" ]]; then
+    echo -n "[boto]"
     echo "[profile $AWS_DEFAULT_PROFILE]" >> ~/.boto
     echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.boto
     echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.boto
     echo "" >> ~/.boto
   fi
+  if [[ -z "$SKIP_SSHCONFIG" ]]; then
+    echo -n "[ssh]"
+    echo "#############################################" >> ~/.ssh/config
+    echo "############### $AWS_DEFAULT_PROFILE ###############" >> ~/.ssh/config
+    echo "#############################################" >> ~/.ssh/config
+    if [[ ! -z "$AWS_NETMASK" ]]; then
+      echo "Host $AWS_NETMASK.*" >> ~/.ssh/config
+      echo "    ProxyCommand ssh -W %h:%p $AWS_VPC_STACK-bastion" >> ~/.ssh/config
+      echo "    User $AWS_SSH_USERNAME" >> ~/.ssh/config
+      echo "" >> ~/.ssh/config
+    fi
+      if [[ ! -z "$SSH_HOST_PREFIX" ]]; then
+            export PREFIX="--prefix $SSH_HOST_PREFIX"
+      fi
+    aws-ssh-config --tags Name --private --profile=$AWS_DEFAULT_PROFILE --user=$AWS_SSH_USERNAME $PREFIX >> ~/.ssh/config
+  fi
+  echo "" 
 
   unset AWS_VPC_STACK
   unset SKIP_SSHCONFIG
@@ -61,4 +58,5 @@ for FILE in ~/workspace/aws-creds/*.txt; do
   unset DO_BOTOCONFIG
   unset DO_AWSCONFIG
   unset AWS_DEFAULT_PROFILE
+  unset SSH_HOST_PREFIX
 done
