@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 DEBUG="false";
 MAXCACHEAGE="60";
 COMMAND="false";

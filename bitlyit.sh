@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 # get your bitly api key from https://bitly.com/a/account.  Fill the API key in below along with your username
 BITLY_APIKEY="yourapikey"
 BITLY_USERNAME="yourbitlyusername"
