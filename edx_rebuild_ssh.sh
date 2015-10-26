@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 cat ~/.ssh/header.cfg > ~/.ssh/config
 echo '' > ~/.aws/credentials

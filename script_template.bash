@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 DEBUG="false"
 function usage {
    echo "$0 - $VERSION (2012 - fred.smith@fredsmith.org)";
