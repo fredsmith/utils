@@ -1,0 +1,16 @@
+#! /usr/bin/env bash
+
+xkcd()
+{
+  word_len=$1
+  words=$2
+  word_len=${word_len:=10}
+  words=${words:=4}
+  shuf -n ${words} /Users/derf/bin/dict/xkcd-${word_len}.txt | tr '\n' ' '
+  echo
+}
+
+
+if [[ `basename -- $0` -eq "xkcdpp" ]]; then
+  xkcd $@
+fi
