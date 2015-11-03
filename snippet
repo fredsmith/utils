@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+
+cd ~/Documents/snips
+
+
+SNIPPETFILE=$((for FILE in *; do echo "$FILE:: $(head -n 1 "$FILE")"; done) | fzf -d '::' | sed -e 's/::.*//')
+
+cat "$SNIPPETFILE" | xclip -selection clipboard
+sleep .5
