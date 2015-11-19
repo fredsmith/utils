@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+
+scp $1 mimas:derf.us/screenshots/
+echo "http://derf.us/screenshots/$1" | xclip -selection clipboard
+sleep .5
