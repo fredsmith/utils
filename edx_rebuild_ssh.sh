@@ -11,19 +11,35 @@ for FILE in ~/workspace/aws-creds/*.txt; do
   echo -n " - `basename $FILE` "
   if [[ ! -z "$DO_AWSCONFIG" ]]; then
     echo -n "[AWS]"
-    echo "[$AWS_DEFAULT_PROFILE]" >> ~/.aws/credentials
-    echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
-    echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
-    echo "" >> ~/.aws/credentials
+    if [[ ! -z "$AWS_ACCESS_KEY_ID" ]]; then
+      echo "[$AWS_DEFAULT_PROFILE]" >> ~/.aws/credentials
+      echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
+      echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
+      echo "" >> ~/.aws/credentials
+    fi
     echo "[profile $AWS_DEFAULT_PROFILE]" >> ~/.aws/config
     echo "region=$AWS_DEFAULT_REGION" >> ~/.aws/config
+    if [[ ! -z "$AWS_ROLE_ARN" ]]; then
+      echo "role_arn=$AWS_ROLE_ARN" >> ~/.aws/config
+      echo "source_profile=$AWS_SOURCE_PROFILE" >> ~/.aws/config
+    fi
+    if [[ ! -z "$AWS_MFA_SERIAL" ]]; then
+      echo "mfa_serial=$AWS_MFA_SERIAL" >> ~/.aws/config
+    fi
     echo "" >> ~/.aws/config
   fi
   if [[ ! -z "$DO_BOTOCONFIG" ]]; then
     echo -n "[boto]"
     echo "[profile $AWS_DEFAULT_PROFILE]" >> ~/.boto
-    echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.boto
-    echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.boto
+    if [[ ! -z "$AWS_ACCESS_KEY_ID" ]]; then
+      echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.boto
+      echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.boto
+    fi
+    if [[ ! -z "$AWS_ROLE_ARN" ]]; then
+      echo "role_arn=$AWS_ROLE_ARN" >> ~/.boto
+      echo "source_profile=$AWS_SOURCE_PROFILE" >> ~/.boto
+    fi
+
     echo "" >> ~/.boto
   fi
   if [[ -z "$SKIP_SSHCONFIG" ]]; then
@@ -59,4 +75,7 @@ for FILE in ~/workspace/aws-creds/*.txt; do
   unset DO_AWSCONFIG
   unset AWS_DEFAULT_PROFILE
   unset SSH_HOST_PREFIX
+  unset AWS_ROLE_ARN
+  unset AWS_SOURCE_PROFILE
+  unset AWS_MFA_SERIAL
 done
