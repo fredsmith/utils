@@ -1,0 +1,105 @@
+#! /usr/bin/env bash
+
+DEBUG="false";
+TITLE=$(basename $(pwd));
+RESOLUTION="1200x1400";
+
+function usage {
+   echo "$0 - $VERSION (2016 - fred.smith@fredsmith.org)";
+   echo "make HTML gallery";
+   echo "Usage: $0 [options]";
+   echo "options:";
+   echo "    -d         Debug mode";
+   echo "    -i         Install gallery";
+   echo "    -r <HxW>   Resolution";
+   echo "    -t <title> Gallery Title";
+   echo "    -h         Usage (this screen)";
+   
+}
+
+function install_gallery {
+  echo "installing gallery";
+  tempdir=$(mktemp -d)
+  curl https://codeload.github.com/blueimp/Gallery/zip/master > $tempdir/gallery.zip;
+  (cd $tempdir; unzip gallery.zip;);
+  mv $tempdir/*/css .;
+  mv $tempdir/*/js .;
+  mv $tempdir/*/img .;
+  rm -rf $tempdir;
+}
+
+while getopts "dhr:t:i" optionName; do
+      case "$optionName" in
+         d)
+            DEBUG="true"
+            ;;
+         r)
+            RESOLUTION=$OPTARG;
+            ;;
+         t)
+            TITLE=$OPTARG;
+            ;;
+         h)
+            usage;
+            exit;
+            ;;
+         i)
+            install_gallery;
+            exit;
+            ;;
+         [?])
+            usage;
+            exit;
+            ;;
+      esac
+done
+
+cat <<EOF > index.html
+<html>
+<head>
+<title>$TITLE</title>
+<link rel="stylesheet" href="css/blueimp-gallery.min.css">
+</head>
+<body>
+<!-- The Gallery as lightbox dialog, should be a child element of the document body -->
+<div id="blueimp-gallery" class="blueimp-gallery">
+    <div class="slides"></div>
+    <h3 class="title"></h3>
+    <a class="prev">‹</a>
+    <a class="next">›</a>
+    <a class="close">×</a>
+    <a class="play-pause"></a>
+    <ol class="indicator"></ol>
+</div>
+<div id="links">
+EOF
+
+for img in *.{jpg,JPG,png,PNG}; do 
+  ALT_TEXT="";
+  if [[ -e $img ]]; then
+    echo -n "$img";
+    convert $img -resize $RESOLUTION thumbs/$img; 
+    IMG_NAME=$(echo $img | sed -e 's/\..*//');
+    if [[ -e $IMG_NAME.txt ]]; then
+      ALT_TEXT=$(cat $IMG_NAME.txt);
+    else
+      ALT_TEXT=$IMG_NAME;
+    fi
+
+    echo "<a href=\"$img\" title=\"$ALT_TEXT\"><img src=\"thumbs/$img\" alt=\"$ALT_TEXT\" /></a>" >> index.html
+    echo ".";
+  fi
+done
+
+
+cat <<EOF >> index.html
+</div>
+<script src="js/blueimp-gallery.min.js"></script>
+</body>
+</html>
+EOF
+
+GALLERY_URL=$(basename $(pwd))
+rsync -av ../$GALLERY_URL pandora:/var/www/files.derf.us/
+echo "-----"
+echo "https://i.derf.us/$GALLERY_URL/"
