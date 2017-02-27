@@ -1,4 +1,9 @@
 #! /usr/bin/env bash
+
+hostname=$(hostname -s)
 sleep .3
-scrot -s -b -e '~/bin/screenshot_upload $f; mv $f ~/Dropbox/Screenshots'
+#scrot "$hostname-%Y-%m-%d-%H-%M-%S-\$wx\$h.png" -s -b -e '~/bin/screenshot_upload $f; mv $f ~/Pictures/Screenshots'
+filename=~/Pictures/Screenshots/$hostname-$(date +'%Y-%m-%d-%H-%M-%S').png
+maim -s -c 1,0,0,0.6 -p 10 $filename
+~/bin/screenshot_upload $filename
 

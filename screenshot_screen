@@ -1,3 +1,4 @@
 #! /usr/bin/env bash
-scrot -e '~/bin/screenshot_upload $f; mv $f ~/Dropbox/Screenshots'
+hostname=$(hostname -s)
+scrot "$hostname-%Y-%m-%d-%H-%M-%S-\$wx\$h.png" -e '~/bin/screenshot_upload $f; mv $f ~/Pictures/Screenshots'
 
