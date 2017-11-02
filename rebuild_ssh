@@ -1,0 +1,96 @@
+#! /usr/bin/env bash
+
+cat ~/.ssh/header.cfg > ~/.ssh/config
+echo '' > ~/.aws/credentials
+echo '' > ~/.aws/config
+echo '' > ~/.boto
+
+for FILE in ~/workspace/aws-creds/*.txt; do
+  ACCOUNT=$( basename $FILE | sed -e "s/\.txt\$//");
+  echo -n " - $ACCOUNT "
+   if [[ "$@ " == *"$ACCOUNT "* ]]; then
+    echo '' > ~/.ssh/config.$ACCOUNT
+    echo '' > ~/.aws/credentials.$ACCOUNT
+    echo '' > ~/.aws/config.$ACCOUNT
+    echo '' > ~/.boto.$ACCOUNT
+    BOUNCEHOST='none'
+    . $FILE
+    if [[ ! -z "$DO_AWSCONFIG" ]]; then
+      echo -n "[AWS]"
+      if [[ ! -z "$AWS_ACCESS_KEY_ID" ]]; then
+        echo "[$AWS_PROFILE_NAME]" >> ~/.aws/credentials.$ACCOUNT 
+        echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.aws/credentials.$ACCOUNT
+        echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials.$ACCOUNT
+        echo "" >> ~/.aws/credentials.$ACCOUNT
+      fi
+      echo "[profile $AWS_PROFILE_NAME]" >> ~/.aws/config.$ACCOUNT
+      echo "region=$AWS_DEFAULT_REGION" >> ~/.aws/config.$ACCOUNT
+      if [[ ! -z "$AWS_ROLE_ARN" ]]; then
+        echo "role_arn=$AWS_ROLE_ARN" >> ~/.aws/config.$ACCOUNT
+        echo "source_profile=$AWS_SOURCE_PROFILE" >> ~/.aws/config.$ACCOUNT
+      fi
+      if [[ ! -z "$AWS_MFA_ARN" ]]; then
+        echo "mfa_serial=$AWS_MFA_ARN" >> ~/.aws/config.$ACCOUNT
+      fi
+    fi
+    echo "" >> ~/.aws/config.$ACCOUNT
+    if [[ ! -z "$DO_BOTOCONFIG" ]]; then
+      echo -n "[boto]"
+      echo "[profile $AWS_PROFILE_NAME]" >> ~/.boto.$ACCOUNT
+      if [[ ! -z "$AWS_ACCESS_KEY_ID" ]]; then
+        echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.boto.$ACCOUNT
+        echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.boto.$ACCOUNT
+      fi
+      if [[ ! -z "$AWS_ROLE_ARN" ]]; then
+        echo "role_arn=$AWS_ROLE_ARN" >> ~/.boto.$ACCOUNT
+        echo "source_profile=$AWS_SOURCE_PROFILE" >> ~/.boto.$ACCOUNT
+      fi
+
+    fi
+    echo "" >> ~/.boto.$ACCOUNT
+    if [[ -z "$SKIP_SSHCONFIG" ]]; then
+      echo -n "[ssh]"
+      echo "#############################################" >> ~/.ssh/config.$ACCOUNT
+      echo "############### $AWS_PROFILE_NAME ###############" >> ~/.ssh/config.$ACCOUNT
+      echo "#############################################" >> ~/.ssh/config.$ACCOUNT
+      if [[ ! -z "$AWS_NETMASK" ]]; then
+        echo "Host $AWS_NETMASK.*" >> ~/.ssh/config.$ACCOUNT
+        echo "    ProxyCommand ssh -W %h:%p $AWS_VPC_STACK-bastion" >> ~/.ssh/config.$ACCOUNT
+        echo "    User $AWS_SSH_USERNAME" >> ~/.ssh/config.$ACCOUNT
+        echo "" >> ~/.ssh/config.$ACCOUNT
+      fi
+        if [[ ! -z "$SSH_HOST_PREFIX" ]]; then
+              export PREFIX="--prefix $SSH_HOST_PREFIX"
+        fi
+      aws-ssh-config --tags Name --private --user=$AWS_SSH_USERNAME $PREFIX >> ~/.ssh/config.$ACCOUNT
+    else
+      echo "" > ~/.ssh/config.$ACCOUNT
+    fi
+  fi
+
+  cat ~/.ssh/config.$ACCOUNT >> ~/.ssh/config
+  cat ~/.aws/credentials.$ACCOUNT >> ~/.aws/credentials
+  cat ~/.aws/config.$ACCOUNT >> ~/.aws/config
+  cat ~/.boto.$ACCOUNT >> ~/.boto
+  echo "" 
+
+  unset AWS_VPC_STACK
+  unset SKIP_SSHCONFIG
+  unset STACK
+  unset AWS_SSH_KEY
+  unset SSHKEY
+  unset AWS_SSH_USERNAME
+  unset SSHUSER
+  unset AWS_ACCESS_KEY_ID
+  unset AWS_SECRET_ACCESS_KEY
+  unset AWS_NETMASK
+  unset BOUNCEHOST
+  unset DO_BOTOCONFIG
+  unset DO_AWSCONFIG
+  unset AWS_DEFAULT_PROFILE
+  unset AWS_PROFILE_NAME
+  unset SSH_HOST_PREFIX
+  unset AWS_ROLE_ARN
+  unset AWS_SOURCE_PROFILE
+  unset AWS_MFA_ARN
+done
