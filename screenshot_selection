@@ -3,7 +3,8 @@
 hostname=$(hostname -s)
 sleep .3
 #scrot "$hostname-%Y-%m-%d-%H-%M-%S-\$wx\$h.png" -s -b -e '~/bin/screenshot_upload $f; mv $f ~/Pictures/Screenshots'
-filename=~/Pictures/Screenshots/$hostname-$(date +'%Y-%m-%d-%H-%M-%S').png
+randstring=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
+filename=~/Pictures/Screenshots/$hostname-$(date +'%Y-%m-%d-%H-%M-%S')-$randstring.png
 maim -s -c 1,0,0,0.6 -p 10 $filename
 ~/bin/screenshot_upload $filename
 
