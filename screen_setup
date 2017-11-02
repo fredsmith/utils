@@ -2,15 +2,32 @@
 
 set -x
 
-MONITORS=$(xrandr | grep ' connected' | cut -f 1 -d ' ');
-MONITOR_COUNT=$(echo "$MONITORS" | wc -l);
-if [[ $MONITOR_COUNT -eq "3" ]]; then
+# include string parsing shortcuts
+. ~/dotfiles/bash/building-blocks
+
+WALLPAPER="/home/derf/Pictures/wallpapers/portofino-left.png"
+LEFT_WALLPAPER="/home/derf/Pictures/wallpapers/portofino-left.png"
+RIGHT_WALLPAPER="/home/derf/Pictures/wallpapers/portofino-right.png"
+
+MONITORS=$(xrandr | grep ' connected' | cut -f 1 -d ' ' | sort | singleline ' ');
+if [[ "$MONITORS" == "DP-2-1 DP-2-2 eDP-1" ]]; then
     xrandr --output DP-2-1 --left-of eDP-1 --auto --primary --output DP-2-2 --left-of DP-2-1 --auto --output eDP-1 --auto
-    notify-send "setting up 3 displays" -i preferences-desktop-display
-elif [[ $MONITOR_COUNT -eq "2" ]]; then
-    xrandr --output eDP-1 --auto --primary --output HDMI-2 --left-of eDP-1 --auto --output DP-2-1 --off --output DP-2-2 --off
-    notify-send "setting up 2 display" -i preferences-desktop-display
-elif [[ $MONITOR_COUNT -eq "1" ]]; then
-    xrandr --output eDP-1 --auto --primary --output DP-2-1 --off --output DP-2-2 --off
+    notify-send "setting up 3 displays - Work" -i preferences-desktop-display
+    feh --bg-scale $RIGHT_WALLPAPER --bg-scale $LEFT_WALLPAPER
+elif [[ "$MONITORS" == "eDP-1 HDMI-1 HDMI-2" ]]; then
+    xrandr --output HDMI-2 --left-of HDMI-1 --auto --output eDP-1 --left-of HDMI-2 --auto --output HDMI-1 --auto --primary
+    notify-send "setting up 3 displays - Home" -i preferences-desktop-display
+    feh --bg-scale $RIGHT_WALLPAPER --bg-scale $LEFT_WALLPAPER
+elif [[ "$MONITORS" == "eDP-1 HDMI-2" ]]; then
+    xrandr --output eDP-1 --auto --primary --output HDMI-2 --right-of eDP-1 --auto --output DP-2-1 --off --output DP-2-2 --off
+    notify-send "setting up 2 displays" -i preferences-desktop-display
+    feh --bg-scale $RIGHT_WALLPAPER --bg-scale $LEFT_WALLPAPER
+elif [[ "$MONITORS" == "eDP-1 HDMI-1" ]]; then
+    xrandr --output eDP-1 --auto --primary --output HDMI-1 --right-of eDP-1 --auto --output DP-2-1 --off --output DP-2-2 --off
+    notify-send "setting up 2 displays" -i preferences-desktop-display
+    feh --bg-scale $RIGHT_WALLPAPER --bg-scale $LEFT_WALLPAPER
+elif [[ "$MONITORS" == "eDP-1" ]]; then
+    xrandr --output eDP-1 --auto --primary --output DP-2-1 --off --output DP-2-2 --off --output HDMI-2 --off --output HDMI-1 --off
     notify-send "setting up 1 display" -i preferences-desktop-display
+    feh --bg-scale $WALLPAPER
 fi
