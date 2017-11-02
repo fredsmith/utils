@@ -12,25 +12,25 @@ for FILE in ~/workspace/aws-creds/*.txt; do
   if [[ ! -z "$DO_AWSCONFIG" ]]; then
     echo -n "[AWS]"
     if [[ ! -z "$AWS_ACCESS_KEY_ID" ]]; then
-      echo "[$AWS_DEFAULT_PROFILE]" >> ~/.aws/credentials
+      echo "[$AWS_PROFILE_NAME]" >> ~/.aws/credentials
       echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
       echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
       echo "" >> ~/.aws/credentials
     fi
-    echo "[profile $AWS_DEFAULT_PROFILE]" >> ~/.aws/config
+    echo "[profile $AWS_PROFILE_NAME]" >> ~/.aws/config
     echo "region=$AWS_DEFAULT_REGION" >> ~/.aws/config
     if [[ ! -z "$AWS_ROLE_ARN" ]]; then
       echo "role_arn=$AWS_ROLE_ARN" >> ~/.aws/config
       echo "source_profile=$AWS_SOURCE_PROFILE" >> ~/.aws/config
     fi
-    if [[ ! -z "$AWS_MFA_SERIAL" ]]; then
-      echo "mfa_serial=$AWS_MFA_SERIAL" >> ~/.aws/config
+    if [[ ! -z "$AWS_MFA_ARN" ]]; then
+      echo "mfa_serial=$AWS_MFA_ARN" >> ~/.aws/config
     fi
     echo "" >> ~/.aws/config
   fi
   if [[ ! -z "$DO_BOTOCONFIG" ]]; then
     echo -n "[boto]"
-    echo "[profile $AWS_DEFAULT_PROFILE]" >> ~/.boto
+    echo "[profile $AWS_PROFILE_NAME]" >> ~/.boto
     if [[ ! -z "$AWS_ACCESS_KEY_ID" ]]; then
       echo "aws_access_key_id=$AWS_ACCESS_KEY_ID" >> ~/.boto
       echo "aws_secret_access_key=$AWS_SECRET_ACCESS_KEY" >> ~/.boto
@@ -45,7 +45,7 @@ for FILE in ~/workspace/aws-creds/*.txt; do
   if [[ -z "$SKIP_SSHCONFIG" ]]; then
     echo -n "[ssh]"
     echo "#############################################" >> ~/.ssh/config
-    echo "############### $AWS_DEFAULT_PROFILE ###############" >> ~/.ssh/config
+    echo "############### $AWS_PROFILE_NAME ###############" >> ~/.ssh/config
     echo "#############################################" >> ~/.ssh/config
     if [[ ! -z "$AWS_NETMASK" ]]; then
       echo "Host $AWS_NETMASK.*" >> ~/.ssh/config
@@ -56,7 +56,7 @@ for FILE in ~/workspace/aws-creds/*.txt; do
       if [[ ! -z "$SSH_HOST_PREFIX" ]]; then
             export PREFIX="--prefix $SSH_HOST_PREFIX"
       fi
-    aws-ssh-config --tags Name --private --profile=$AWS_DEFAULT_PROFILE --user=$AWS_SSH_USERNAME $PREFIX >> ~/.ssh/config
+    aws-ssh-config --tags Name --private --user=$AWS_SSH_USERNAME $PREFIX >> ~/.ssh/config
   fi
   echo "" 
 
@@ -74,8 +74,9 @@ for FILE in ~/workspace/aws-creds/*.txt; do
   unset DO_BOTOCONFIG
   unset DO_AWSCONFIG
   unset AWS_DEFAULT_PROFILE
+  unset AWS_PROFILE_NAME
   unset SSH_HOST_PREFIX
   unset AWS_ROLE_ARN
   unset AWS_SOURCE_PROFILE
-  unset AWS_MFA_SERIAL
+  unset AWS_MFA_ARN
 done
