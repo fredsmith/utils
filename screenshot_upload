@@ -1,5 +1,8 @@
 #! /usr/bin/env bash
 
+
+. ~/dotfiles/bash/ssh
+
 scp $1 pandora:/var/www/files.derf.us/
 file_basename=$(basename $1)
 echo "https://files.derf.us/$file_basename" | xclip -selection clipboard
