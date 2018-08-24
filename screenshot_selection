@@ -4,6 +4,5 @@ hostname=$(hostname -s)
 sleep .3
 randstring=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 filename=~/Pictures/Screenshots/$hostname-$(date +'%Y-%m-%d-%H-%M-%S')-$randstring.png
-maim -s -c 1,0,0,0.6 -p 10 $filename
-~/bin/screenshot_upload $filename
+maim -s -c 1,0,0,0.6 -p 10 $filename && ~/bin/screenshot_upload $filename
 
