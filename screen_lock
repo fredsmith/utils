@@ -1,9 +1,11 @@
 #! /usr/bin/env bash
 
-icon="$HOME/Pictures/lock.png"
+icon="$HOME/Pictures/anno_lock.png"
 tmpbg='/tmp/screen.png'
 
 (( $# )) && { icon=$1; }
+
+screen_setup
 
 scrot "$tmpbg"
 convert "$tmpbg" -scale 5% -scale 2000% "$tmpbg"
@@ -36,6 +38,13 @@ then
 fi
 
 
-#convert "$tmpbg" "$icon" -gravity center -composite -matte "$tmpbg"
+
+
+#sleep 5
+
+#grep 'closed' /proc/acpi/button/lid/LID/state && 
+
+
 i3lock -i "$tmpbg"
 
+#sudo pm-suspend
