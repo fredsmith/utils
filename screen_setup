@@ -26,7 +26,32 @@ elif [[ "$MONITORS" == "eDP-1 HDMI-1" ]]; then
     xrandr --output eDP-1 --auto --primary --output HDMI-1 --right-of eDP-1 --auto --output DP-2-1 --off --output DP-2-2 --off
     notify-send "setting up 2 displays" -i preferences-desktop-display
     feh --bg-scale $RIGHT_WALLPAPER --bg-scale $LEFT_WALLPAPER
+elif [[ "$MONITORS" == "DP-2-1 eDP-1" ]]; then
+    if `ping -c 1 -w 1 prometheus.smithfamily.io`; then
+      xrandr --output DP-2-1 --off --output eDP-1 --primary --auto --output HDMI-1 --off --output DP-2-2 --off
+      notify-send "setting up home with room for prometheus.  1 displays and synergy" -i preferences-desktop-display
+      feh --bg-scale $WALLPAPER
+    else
+      xrandr --output DP-2-1 --auto --primary --output eDP-1 --right-of DP-2-1 --auto --output HDMI-1 --off --output DP-2-2 --off
+      notify-send "setting up home.  2 displays and synergy" -i preferences-desktop-display
+      feh --bg-scale $RIGHT_WALLPAPER --bg-scale $LEFT_WALLPAPER
+    fi
+    killall synergyc
+    synergyc --enable-drag-drop --name atlas titan.local
+elif [[ "$MONITORS" == "DP-2-2 eDP-1" ]]; then
+    if `ping -c 1 -w 1 prometheus.smithfamily.io`; then
+      xrandr --output DP-2-2 --off --output eDP-1 --primary --auto --output HDMI-1 --off --output DP-2-1 --off
+      notify-send "setting up home with room for prometheus.  1 displays and synergy" -i preferences-desktop-display
+      feh --bg-scale $WALLPAPER
+    else
+      xrandr --output DP-2-2 --auto --primary --output eDP-1 --right-of DP-2-1 --auto --output HDMI-1 --off --output DP-2-1 --off
+      notify-send "setting up home.  2 displays and synergy" -i preferences-desktop-display
+      feh --bg-scale $RIGHT_WALLPAPER --bg-scale $LEFT_WALLPAPER
+    fi
+    killall synergyc
+    synergyc --enable-drag-drop --name atlas titan.local
 elif [[ "$MONITORS" == "eDP-1" ]]; then
+    killall synergyc
     xrandr --output eDP-1 --auto --primary --output DP-2-1 --off --output DP-2-2 --off --output HDMI-2 --off --output HDMI-1 --off
     notify-send "setting up 1 display" -i preferences-desktop-display
     feh --bg-scale $WALLPAPER
