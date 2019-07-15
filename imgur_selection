@@ -1,3 +1,0 @@
-#! /usr/bin/env bash
-scrot -s -b -e '~/bin/imgur_upload $f; mv $f ~/Pictures/screenshots'
-

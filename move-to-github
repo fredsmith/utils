@@ -1,0 +1,21 @@
+#! /usr/bin/env bash
+
+GHUSER='fredsmith'
+
+repo=$(echo $1 | sed -e 's/\///g');
+
+if [[ -z "$2" ]]; then
+  target=$repo;
+else
+  target=$2;
+fi
+
+if [ -d $repo ]; then
+  cd $repo; 
+  hub create -p $target
+  git remote add github git@github.com:$GHUSER/$target.git
+  git push -u github master
+  cd ..
+  mv $repo ~/src/github.com/$GHUSER/
+fi
+

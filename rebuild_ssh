@@ -17,7 +17,8 @@
 # until . ~/bin/assume-role edx `pass otp otp/aws`; do
 #   sleep 30;
 # done
-
+source ~/src/github.com/fredsmith/dotfiles/bash/setenv
+source ~/src/github.com/fredsmith/dotfiles/bash/pass
 
 
 cat ~/.ssh/header.cfg > ~/.ssh/config
@@ -25,8 +26,14 @@ echo '' > ~/.aws/credentials
 echo '' > ~/.aws/config
 echo '' > ~/.boto
 
-for FILE in ~/workspace/aws-creds/*.txt; do
-  ACCOUNT=$( basename $FILE | sed -e "s/\.txt\$//");
+if [ ! -z "$PASSWORD_STORE_DIR" ]; then
+  passdir=$PASSWORD_STORE_DIR
+else
+  passdir='~/.password-store'
+fi
+
+for FILE in $passdir/env/*.gpg; do
+  ACCOUNT=$( basename $FILE | sed -e "s/\.gpg\$//");
   echo -n " - $ACCOUNT "
    if [[ "$@ " == *"$ACCOUNT "* ]]; then
     echo '' > ~/.ssh/config.$ACCOUNT
@@ -34,7 +41,7 @@ for FILE in ~/workspace/aws-creds/*.txt; do
     echo '' > ~/.aws/config.$ACCOUNT
     echo '' > ~/.boto.$ACCOUNT
     BOUNCEHOST='none'
-    . $FILE
+    setenv $ACCOUNT
     if [[ ! -z "$DO_AWSCONFIG" ]]; then
       echo -n "[AWS]"
       if [[ ! -z "$AWS_ACCESS_KEY_ID" ]]; then
@@ -82,7 +89,7 @@ for FILE in ~/workspace/aws-creds/*.txt; do
         if [[ ! -z "$SSH_HOST_PREFIX" ]]; then
               export PREFIX="--prefix $SSH_HOST_PREFIX"
         fi
-      aws-ssh-config --tags Name --private --user=$AWS_SSH_USERNAME $PREFIX >> ~/.ssh/config.$ACCOUNT
+      aws-ssh-config.py --tags Name --private --user=$AWS_SSH_USERNAME $PREFIX >> ~/.ssh/config.$ACCOUNT
     else
       echo "" > ~/.ssh/config.$ACCOUNT
     fi

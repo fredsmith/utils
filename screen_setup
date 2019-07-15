@@ -3,7 +3,7 @@
 set -x
 
 # include string parsing shortcuts
-. ~/dotfiles/bash/building-blocks
+. ~/src/github.com/fredsmith/dotfiles/bash/building-blocks
 
 WALLPAPER="/home/derf/Pictures/wallpapers/great-south-bay-sunset-right.jpg"
 LEFT_WALLPAPER="/home/derf/Pictures/wallpapers/great-south-bay-sunset-left.jpg"
@@ -11,7 +11,7 @@ RIGHT_WALLPAPER="/home/derf/Pictures/wallpapers/great-south-bay-sunset-right.jpg
 
 MONITORS=$(xrandr | grep ' connected' | cut -f 1 -d ' ' | sort | singleline ' ');
 if [[ "$MONITORS" == "DP-2-1 DP-2-2 eDP-1" ]]; then
-    xrandr --output DP-2-2 --left-of eDP-1 --auto --primary --output DP-2-1 --left-of DP-2-2 --auto --output eDP-1 --auto
+    xrandr --output DP-2-1 --right-of eDP-1 --auto --primary --output DP-2-2 --right-of DP-2-1 --auto --output eDP-1 --auto
     notify-send "setting up 3 displays - Work" -i preferences-desktop-display
     feh --bg-scale $RIGHT_WALLPAPER --bg-scale $LEFT_WALLPAPER
 elif [[ "$MONITORS" == "eDP-1 HDMI-1 HDMI-2" ]]; then

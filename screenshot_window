@@ -1,5 +1,1 @@
-#! /usr/bin/env bash
-hostname=$(hostname -s)
-sleep .3
-scrot "$hostname-%Y-%m-%d-%H-%M-%S-\$wx\$h.png" -s -b -e '~/bin/screenshot_upload $f; mv $f ~/Pictures/Screenshots'
-
+/home/derf/src/github.com/fredsmith/imgur-upload-tools/screenshot_window
